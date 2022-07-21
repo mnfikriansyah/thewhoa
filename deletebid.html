@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Bid</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+    integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12 d-flex justify-content-end fs-5">
+        <a class="text-dark me-4" href="index.html">Home/Index</a>
+        <a class="text-dark me-4" href="makebid.html">Make A Bid</a>
+        <a class="text-dark me-4" href="updatebid.html">Update Bid</a>
+        <a class="text-dark" href="viewallbids.html">Admin - View All Bids</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive">
+          <table class="table table-dark table-striped" id="itemTable">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Bidder ID</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Bid Price</th>
+                <th>Item ID</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Start Price</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript">
+    function getData() {
+      $.ajax({
+        url: "api/bids",
+        dataType: "json",
+        success: function (result) {
+          for (var i = 0; i < result.data.length; i++) {
+            var num = i + 1;
+            var row = $(
+              "<tr><td>" +
+              num +
+              "</td><td>" +
+              result.data[i].bidder_id +
+              "</td><td>" +
+              result.data[i].biddername +
+              "</td><td>" +
+              result.data[i].contact +
+              "</td><td>" +
+              result.data[i].bidprice +
+              "</td><td>" +
+              result.data[i].item_id +
+              "</td><td>" +
+              result.data[i].itemdesc +
+              "</td><td>" +
+              result.data[i].category +
+              "</td><td>" +
+              result.data[i].startprice +
+              "</td><td><button class='btn btn-danger' onclick='deleteBid(\"" + result.data[i].bidderid + "\")'><i class='bi bi-trash'></i></button></td></tr>"
+            );
+            $("#itemTable").append(row);
+          }
+        },
+      });
+    }
+
+    function deleteBid(id) {
+      var json = {
+        bidderid: id,
+      }
+
+      $.ajax({
+        url: "api/bid/" + id,
+        type: 'DELETE',
+        contentType: 'application/x-www-form-urlencoded',
+        dataType: 'json',
+        data: json,
+        success: function (result) {
+          $('#itemTable tbody').empty();
+          getData();
+          $('#alert').show();
+          $('#alert-message').text('Success: ' + result.message);
+        },
+        error: function (response) {
+          $('#alert').show();
+          $('#alert-message').text('Error: ' + JSON.parse(response.responseText).message);
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      getData();
+    });
+  </script>
+</body>
+
+</html>

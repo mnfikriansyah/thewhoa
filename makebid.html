@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Make Bid</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12 d-flex justify-content-end fs-5">
+        <a class="text-dark me-4" href="index.html">Home/Index</a>
+        <a class="text-dark me-4" href="updatebid.html">Update Bid</a>
+        <a class="text-dark me-4" href="deletebid.html">Delete Bid</a>
+        <a class="text-dark" href="viewallbids.html">Admin - View All Bids</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive">
+          <table class="table table-dark table-striped" id="itemTable">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Item ID</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Start Price</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-12">
+        <h3>Make A Bid</h3>
+        <form action="" id="formBid" class="form-data">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">ID:</label>
+                <input class="form-control" type="text" name="bidder_id" id="bidder_id">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">item_id</label>
+                <input class="form-control" type="text" name="item_id" id="item_id">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">Name:</label>
+                <input class="form-control" type="text" name="biddername" id="biddername">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">Description:</label>
+                <input class="form-control" type="text" name="itemdesc" id="itemdesc">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">Contact Num :</label>
+                <input class="form-control" type="text" name="contact" id="contact">
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">Category :</label>
+                <input class="form-control" type="text" name="category" id="category">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-6">
+              <div class="form-group">
+                <button type="button" role="button" onclick="addBid()" class="btn btn-success">Add My Bid</button>
+                <button type="reset" onclick="formReset();" class="btn btn-success">Reset Form</button>
+              </div>
+              <div class="form-group mt-2" style="display: none;" id="alert">
+                <div class="alert alert-info">
+                  <span id="alert-message" class="text text-dark mb-0">sss</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="">Start Price (RM) :</label>
+                <input class="form-control" type="number" name="startprice" id="startprice">
+              </div>
+              <div class="form-group">
+                <label for="">My Bid Price (RM) :</label>
+                <input class="form-control" type="number" name="bidprice" id="bidprice">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript">
+    $.ajax({
+      url: "api/antiqueitems",
+      dataType: "json",
+      success: function (result) {
+        for (var i = 0; i < result.data.length; i++) {
+          var num = i + 1;
+          var row = $(
+            "<tr><td>" +
+            num +
+            "</td><td>" +
+            result.data[i].item_id +
+            "</td><td>" +
+            result.data[i].itemdesc +
+            "</td><td>" +
+            result.data[i].category +
+            "</td><td>" +
+            result.data[i].startprice +
+            "</td></tr>"
+          );
+          $("#itemTable").append(row);
+        }
+      },
+    });
+
+    function addBid() {
+      $.ajax({
+        type: 'POST',
+        url: "api/bid",
+        enctype: 'multipart/form-data',
+        processData: false,
+        contentType: false,
+        data: new FormData(document.querySelector('.form-data')),
+        success: function (result) {
+          formReset();
+          $('#alert').show();
+          $('#alert-message').text('Success: ' + result.message);
+        },
+        error: function (response) {
+          formReset();
+          $('#alert').show();
+          $('#alert-message').text('Error: ' + JSON.parse(response.responseText).message);
+        }
+      });
+    }
+
+    function formReset() {
+      document.getElementById('formBid').reset();
+      $('#alert').hide();
+    }
+  </script>
+</body>
+
+</html>
